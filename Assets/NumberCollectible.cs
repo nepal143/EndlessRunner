@@ -8,8 +8,11 @@ public class NumberCollectible : MonoBehaviour
     [Tooltip("Time before object is destroyed after playing the effect")]
     public float destroyDelay = 1f;
 
-    [Tooltip("Reference to the particle effect GameObject (should be disabled by default and have 'Play On Awake' enabled)")]
-    public GameObject particleEffect;
+    [Tooltip("Particle effect prefab (should be disabled in the project)")]
+    public GameObject particleEffectPrefab;
+
+    [Tooltip("Optional: Transform where the particle effect should spawn")]
+    public Transform effectSpawnPoint;
 
     [Tooltip("Sound to play when collected")]
     public AudioClip collectSound;
@@ -19,43 +22,54 @@ public class NumberCollectible : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (collected) return;
-        if (other.CompareTag("Player"))
-        {
-            collected = true;
+        if (!other.CompareTag("Player")) return;
 
-            // Increase number
-            CurrentNumberManager numberManager = FindObjectOfType<CurrentNumberManager>();
-            if (numberManager != null)
+        collected = true;
+
+        // Increase number
+        CurrentNumberManager numberManager = FindObjectOfType<CurrentNumberManager>();
+        if (numberManager != null)
+        {
+            numberManager.IncreaseNumber(increaseAmount);
+        }
+        else
+        {
+            Debug.LogWarning("CurrentNumberManager not found in scene!");
+        }
+
+        // Play collect sound
+        if (collectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(collectSound, transform.position);
+        }
+
+        // Spawn particle effect at spawn point or fallback to current position
+        Vector3 spawnPosition = effectSpawnPoint != null ? effectSpawnPoint.position : transform.position;
+
+        if (particleEffectPrefab != null)
+        {
+            GameObject effectInstance = Instantiate(particleEffectPrefab, spawnPosition, Quaternion.identity);
+            ParticleSystem ps = effectInstance.GetComponent<ParticleSystem>();
+            if (ps != null)
             {
-                numberManager.IncreaseNumber(increaseAmount);
+                ps.Play();
+                Destroy(effectInstance, ps.main.duration + ps.main.startLifetime.constantMax);
             }
             else
             {
-                Debug.LogWarning("CurrentNumberManager not found in scene!");
+                Destroy(effectInstance, 2f); // fallback
             }
-
-            // Play collect sound
-            if (collectSound != null)
-            {
-                AudioSource.PlayClipAtPoint(collectSound, transform.position);
-            }
-
-            // Enable particle effect
-            if (particleEffect != null)
-            {
-                particleEffect.SetActive(true);
-            }
-
-            // Hide visuals and disable collider
-            foreach (Renderer r in GetComponentsInChildren<Renderer>())
-                r.enabled = false;
-
-            Collider col = GetComponent<Collider>();
-            if (col != null)
-                col.enabled = false;
-
-            // Destroy after delay
-            Destroy(gameObject, destroyDelay);
         }
+
+        // Hide visuals and disable collider
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = false;
+
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = false;
+
+        // Destroy collectible after delay
+        Destroy(gameObject, destroyDelay);
     }
 }

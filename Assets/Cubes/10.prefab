@@ -125,9 +125,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   increaseAmount: 10
   destroyDelay: 3
-  particleEffect: {fileID: 74078499623404262, guid: 9790383d97594f049aecba8cf470e3b7,
+  particleEffectPrefab: {fileID: 74078499623404262, guid: 9790383d97594f049aecba8cf470e3b7,
     type: 3}
-  collectSound: {fileID: 8300000, guid: b601ebdce6fe23049a6ef8137142d0f2, type: 3}
+  collectSound: {fileID: 8300000, guid: 9c32d825a5322b748909a61083c24216, type: 3}
 --- !u!65 &-5371374471292598872
 BoxCollider:
   m_ObjectHideFlags: 0

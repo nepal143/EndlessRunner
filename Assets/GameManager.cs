@@ -6,11 +6,9 @@ public class GameManager : MonoBehaviour
 {
     [Header("References")]
     public TextMeshProUGUI requiredNumberText;
-    public TextMeshProUGUI currentNumberText; // Reference to the actual UI text
     public CurrentNumberManager currentNumberManager;
 
     [Header("Typing Animation")]
-    public ScoreManager scoreManager;
     public float typeSpeed = 0.05f;
 
     [Header("Sound Effects")]
@@ -27,15 +25,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (currentNumberText == null || alreadyResetting)
+        if (currentNumberManager == null || alreadyResetting)
             return;
 
-        if (!int.TryParse(currentNumberText.text, out int currentDisplayedNumber))
-            return;
+        int currentDisplayedNumber = currentNumberManager.currentNumber;
 
         if (currentDisplayedNumber == requiredNumber && requiredNumber != 0)
         {
             Debug.Log("Correct number! Score +1");
+
             if (correctSound != null)
                 AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
 
@@ -44,7 +42,7 @@ public class GameManager : MonoBehaviour
         }
         else if (currentDisplayedNumber > requiredNumber)
         {
-            Debug.Log("Too high");
+            Debug.Log("Too high!");
 
             if (wrongSound != null)
                 AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
@@ -67,6 +65,7 @@ public class GameManager : MonoBehaviour
         float elapsed = 0f;
         Color originalColor = requiredNumberText.color;
 
+        // Fade out
         while (elapsed < fadeDuration)
         {
             float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
@@ -75,11 +74,13 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
+        // Set new number
         requiredNumber = Random.Range(111, 999);
         string fullText = "Give me " + requiredNumber;
         requiredNumberText.text = "";
         requiredNumberText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f);
 
+        // Type letter by letter
         for (int i = 0; i < fullText.Length; i++)
         {
             requiredNumberText.text += fullText[i];
