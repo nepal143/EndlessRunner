@@ -6,14 +6,15 @@ public class MapSpawner : MonoBehaviour
     public Transform player;
     public GameObject tilePrefab;
     public float tileLength = 10f;
-    public int tilesAhead = 5;
-    public int maxTiles = 7;
+    public int tilesAhead = 8;
+    public int maxTiles = 15;
 
-    private float spawnZ = 0f;
+    private float spawnZ = 92f; // Start spawning from z = 92
     private Queue<GameObject> spawnedTiles = new Queue<GameObject>();
 
     void Start()
     {
+        // Initial spawning of tiles from z = 92 up to the initial tilesAhead
         for (int i = 0; i < tilesAhead; i++)
         {
             SpawnTile();

@@ -15,18 +15,35 @@ public class CurrentNumberManager : MonoBehaviour
 
     void Start()
     {
-        UpdateNumberInstant(currentNumber); // Initialize
+        UpdateNumberInstant(currentNumber); // Initialize the number display
     }
 
     public void IncreaseNumber(int amount)
     {
         int newTarget = currentNumber + amount;
+
+        // Stop any ongoing animation
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
+
+        // Start animating to the new number
         animationCoroutine = StartCoroutine(AnimateNumber(currentNumber, newTarget, animationDuration));
         currentNumber = newTarget;
+    }
+
+    public void SetNumber(int value)
+    {
+        // Stop animation if running
+        if (animationCoroutine != null)
+        {
+            StopCoroutine(animationCoroutine);
+            animationCoroutine = null;
+        }
+
+        currentNumber = value;
+        UpdateNumberInstant(currentNumber); // Immediately show new value
     }
 
     void UpdateNumberInstant(int number)
@@ -49,6 +66,7 @@ public class CurrentNumberManager : MonoBehaviour
             yield return null;
         }
 
-        numberText.text = to.ToString(); // Final value
+        // Ensure final value is shown
+        numberText.text = to.ToString();
     }
 }

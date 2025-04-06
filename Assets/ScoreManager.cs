@@ -8,15 +8,16 @@ public class ScoreManager : MonoBehaviour
     [Header("References")]
     public TextMeshProUGUI scoreText;
 
-    private int score = 0;
+    public int score = 0;
 
-    void Awake()
+
+    void Start()
     {
-        Instance = this;
+        UpdateScoreUI(); // Ensure UI starts with Score: 0
     }
 
     public void AddScore(int amount)
-    { 
+    {
         score += amount;
         UpdateScoreUI();
     }

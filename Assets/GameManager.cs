@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public float typeSpeed = 0.05f;
 
     private int requiredNumber;
-    private bool alreadyChecked = false;
+    private bool alreadyResetting = false;
 
     void Start()
     {
@@ -21,32 +21,37 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (currentNumberManager == null || alreadyChecked)
+        if (currentNumberManager == null || alreadyResetting)
             return;
 
         int current = currentNumberManager.currentNumber;
-
+        Debug.Log("Current number: " + current);
+        Debug.Log("Required number: " + requiredNumber);
         if (current == requiredNumber)
         {
+            Debug.Log("Correct number! Score +1");
             ScoreManager.Instance.AddScore(1);
-            ResetNumbers();
+            ResetNumbers(); // Reset only after scoring
         }
         else if (current > requiredNumber)
         {
-            ResetNumbers();
+            Debug.Log("Too high");
+            ResetNumbers(); // No score, just reset
         }
     }
 
+
     void ResetNumbers()
     {
-        alreadyChecked = true;
+        alreadyResetting = true;
 
-        // Animate current number back to 0
-        currentNumberManager.IncreaseNumber(-currentNumberManager.currentNumber);
+        // Instantly reset current number
+        currentNumberManager.SetNumber(0);
 
-        // Animate new "Give me" text
+        // Animate new prompt
         StartCoroutine(AnimateRequiredNumberText());
 
+        // Allow checking again after short delay
         Invoke(nameof(ResetCheckFlag), 0.1f);
     }
 
@@ -65,13 +70,13 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // Generate new number
+        // New required number
         requiredNumber = Random.Range(111, 999);
 
-        // Clear text and start typewriter effect
+        // Typewriter effect
         string fullText = "Give me " + requiredNumber;
         requiredNumberText.text = "";
-        requiredNumberText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f); // Make fully visible
+        requiredNumberText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f);
 
         for (int i = 0; i < fullText.Length; i++)
         {
@@ -82,6 +87,6 @@ public class GameManager : MonoBehaviour
 
     void ResetCheckFlag()
     {
-        alreadyChecked = false;
+        alreadyResetting = false;
     }
 }
