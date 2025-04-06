@@ -6,10 +6,16 @@ public class GameManager : MonoBehaviour
 {
     [Header("References")]
     public TextMeshProUGUI requiredNumberText;
+    public TextMeshProUGUI currentNumberText; // Reference to the actual UI text
     public CurrentNumberManager currentNumberManager;
 
     [Header("Typing Animation")]
+    public ScoreManager scoreManager;
     public float typeSpeed = 0.05f;
+
+    [Header("Sound Effects")]
+    public AudioClip wrongSound;
+    public AudioClip correctSound;
 
     private int requiredNumber;
     private bool alreadyResetting = false;
@@ -21,37 +27,37 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (currentNumberManager == null || alreadyResetting)
+        if (currentNumberText == null || alreadyResetting)
             return;
 
-        int current = currentNumberManager.currentNumber;
-        Debug.Log("Current number: " + current);
-        Debug.Log("Required number: " + requiredNumber);
-        if (current == requiredNumber)
+        if (!int.TryParse(currentNumberText.text, out int currentDisplayedNumber))
+            return;
+
+        if (currentDisplayedNumber == requiredNumber && requiredNumber != 0)
         {
             Debug.Log("Correct number! Score +1");
+            if (correctSound != null)
+                AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
+
             ScoreManager.Instance.AddScore(1);
-            ResetNumbers(); // Reset only after scoring
+            ResetNumbers();
         }
-        else if (current > requiredNumber)
+        else if (currentDisplayedNumber > requiredNumber)
         {
             Debug.Log("Too high");
-            ResetNumbers(); // No score, just reset
+
+            if (wrongSound != null)
+                AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
+
+            ResetNumbers();
         }
     }
-
 
     void ResetNumbers()
     {
         alreadyResetting = true;
-
-        // Instantly reset current number
         currentNumberManager.SetNumber(0);
-
-        // Animate new prompt
         StartCoroutine(AnimateRequiredNumberText());
-
-        // Allow checking again after short delay
         Invoke(nameof(ResetCheckFlag), 0.1f);
     }
 
@@ -61,7 +67,6 @@ public class GameManager : MonoBehaviour
         float elapsed = 0f;
         Color originalColor = requiredNumberText.color;
 
-        // Fade out
         while (elapsed < fadeDuration)
         {
             float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
@@ -70,10 +75,7 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // New required number
         requiredNumber = Random.Range(111, 999);
-
-        // Typewriter effect
         string fullText = "Give me " + requiredNumber;
         requiredNumberText.text = "";
         requiredNumberText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f);

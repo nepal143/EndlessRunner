@@ -148,6 +148,7 @@ MonoBehaviour:
   destroyDelay: 3
   particleEffect: {fileID: 74078499623404262, guid: 9790383d97594f049aecba8cf470e3b7,
     type: 3}
+  collectSound: {fileID: 8300000, guid: b601ebdce6fe23049a6ef8137142d0f2, type: 3}
 --- !u!95 &6345734746880822605
 Animator:
   serializedVersion: 5

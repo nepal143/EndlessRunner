@@ -11,6 +11,9 @@ public class NumberCollectible : MonoBehaviour
     [Tooltip("Reference to the particle effect GameObject (should be disabled by default and have 'Play On Awake' enabled)")]
     public GameObject particleEffect;
 
+    [Tooltip("Sound to play when collected")]
+    public AudioClip collectSound;
+
     private bool collected = false;
 
     private void OnTriggerEnter(Collider other)
@@ -20,7 +23,7 @@ public class NumberCollectible : MonoBehaviour
         {
             collected = true;
 
-            // Increase the number using CurrentNumberManager
+            // Increase number
             CurrentNumberManager numberManager = FindObjectOfType<CurrentNumberManager>();
             if (numberManager != null)
             {
@@ -31,13 +34,19 @@ public class NumberCollectible : MonoBehaviour
                 Debug.LogWarning("CurrentNumberManager not found in scene!");
             }
 
-            // Enable the particle GameObject
+            // Play collect sound
+            if (collectSound != null)
+            {
+                AudioSource.PlayClipAtPoint(collectSound, transform.position);
+            }
+
+            // Enable particle effect
             if (particleEffect != null)
             {
                 particleEffect.SetActive(true);
             }
 
-            // Disable visuals & collider
+            // Hide visuals and disable collider
             foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 r.enabled = false;
 
@@ -45,7 +54,7 @@ public class NumberCollectible : MonoBehaviour
             if (col != null)
                 col.enabled = false;
 
-            // Destroy the object after delay
+            // Destroy after delay
             Destroy(gameObject, destroyDelay);
         }
     }

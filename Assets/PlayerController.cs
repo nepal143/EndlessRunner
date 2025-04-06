@@ -22,6 +22,9 @@ public class EndlessRunnerController : MonoBehaviour
     [Header("Blinking")]
     public GameObject[] blinkObjects; // Assign only the visible parts like body, hat, etc.
 
+    [Header("Audio")]
+    public AudioClip hitSound;
+
     private BoxCollider playerCollider;
 
     void Start()
@@ -103,6 +106,12 @@ public class EndlessRunnerController : MonoBehaviour
         // Knockback
         transform.position -= new Vector3(0, 0, 1f);
 
+        // Play hit sound
+        if (hitSound != null)
+        {
+            AudioSource.PlayClipAtPoint(hitSound, transform.position);
+        }
+
         // Start hit animation
         if (animator != null)
         {
@@ -116,7 +125,7 @@ public class EndlessRunnerController : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("Hit", false);
-            isHitAnimating = false; // Re-enable movement
+            isHitAnimating = false;
         }
 
         // Make collider a trigger to avoid repeat hits
