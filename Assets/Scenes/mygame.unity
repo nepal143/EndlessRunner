@@ -1000,8 +1000,8 @@ MonoBehaviour:
   player: {fileID: 1473486965}
   tilePrefab: {fileID: 1000010272792782, guid: 81bf7d820e3d0554e9ea968eeba33052, type: 3}
   tileLength: 27
-  tilesAhead: 8
-  maxTiles: 15
+  tilesAhead: 4
+  maxTiles: 9
 --- !u!4 &594324956
 Transform:
   m_ObjectHideFlags: 0
@@ -2615,7 +2615,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325210600}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: f4653faaa97897c47bd5a5b46d3c6643, type: 2}
   m_CullingMode: 0
