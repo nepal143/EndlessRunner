@@ -564,7 +564,9 @@ MonoBehaviour:
   currentNumberManager: {fileID: 1230904146}
   typeSpeed: 0.05
   wrongSound: {fileID: 8300000, guid: 941c1dbe12fba9c458fc8ff0047bcc03, type: 3}
-  correctSound: {fileID: 0}
+  correctSound: {fileID: 8300000, guid: c5357ab529bcfa044aca4627177ba57c, type: 3}
+  destroyEffect: {fileID: 6716933543107358038, guid: 8a334e7c388e77347a1dddd727ef3446,
+    type: 3}
 --- !u!4 &272535066 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 2df72ec125264584faa40cb1beef0481,
@@ -1463,7 +1465,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 806684631}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 8a42cabd32522f041be3314909428f57, type: 2}
   m_CullingMode: 0
