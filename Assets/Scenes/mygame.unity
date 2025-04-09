@@ -561,9 +561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requiredNumberText: {fileID: 59732006}
-  currentNumberText: {fileID: 1242883129}
   currentNumberManager: {fileID: 1230904146}
-  scoreManager: {fileID: 184812037}
   typeSpeed: 0.05
   wrongSound: {fileID: 8300000, guid: 941c1dbe12fba9c458fc8ff0047bcc03, type: 3}
   correctSound: {fileID: 0}
@@ -1414,9 +1412,9 @@ RectTransform:
   - {fileID: 59732005}
   m_Father: {fileID: 2007322649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -370, y: 80}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -381, y: -88}
   m_SizeDelta: {x: 550, y: 115}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &806684633
@@ -2566,7 +2564,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -150}
+  m_AnchoredPosition: {x: 17, y: -208}
   m_SizeDelta: {x: 1025, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1325210602
@@ -2972,6 +2970,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardSpeed: 15
+  sprintMultiplier: 2
+  sprintHoldDelay: 0.4
   animator: {fileID: 1505250247}
   blinkObjects:
   - {fileID: 6033528}
@@ -3162,15 +3162,15 @@ RectTransform:
   m_GameObject: {fileID: 1570984049}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.43, y: 0.43, z: 0.43}
+  m_LocalScale: {x: 0.34, y: 0.34, z: 0.34}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1924806157}
   m_Father: {fileID: 2007322649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -189, y: -299}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 60}
   m_SizeDelta: {x: 1025, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1570984051
@@ -3193,7 +3193,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 284493662fba5a54aa51bd122e559f69, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b14874e2af10e6941bafa56d80f07a5f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

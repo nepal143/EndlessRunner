@@ -16,6 +16,12 @@ public class EndlessRunnerController : MonoBehaviour
     private bool isStunned = false;
     private bool isHitAnimating = false;
 
+    [Header("Sprinting")]
+    public float sprintMultiplier = 2f;
+    private bool isSprinting = false;
+    public float sprintHoldDelay = 0.4f;
+    private float holdTimer = 0f;
+
     [Header("Animator")]
     public Animator animator;
 
@@ -38,6 +44,13 @@ public class EndlessRunnerController : MonoBehaviour
         if (!isStunned)
         {
             HandleSwipeInput();
+
+            HandleSprintHold();
+        }
+        else
+        {
+            isSprinting = false;
+            holdTimer = 0f;
         }
 
         if (!isHitAnimating)
@@ -45,7 +58,7 @@ public class EndlessRunnerController : MonoBehaviour
             MoveForward(); // Only move forward if not in hit animation
         }
 
-        MoveToLane(); // Keep aligning to lane always
+        MoveToLane(); // Always align to current lane
     }
 
     void HandleSwipeInput()
@@ -73,6 +86,24 @@ public class EndlessRunnerController : MonoBehaviour
         }
     }
 
+    void HandleSprintHold()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            holdTimer += Time.deltaTime;
+
+            if (holdTimer >= sprintHoldDelay)
+            {
+                isSprinting = true;
+            }
+        }
+        else
+        {
+            holdTimer = 0f;
+            isSprinting = false;
+        }
+    }
+
     void ChangeLane(int direction)
     {
         currentLane += direction;
@@ -88,7 +119,8 @@ public class EndlessRunnerController : MonoBehaviour
 
     void MoveForward()
     {
-        transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime);
+        float speed = isSprinting ? forwardSpeed * sprintMultiplier : forwardSpeed;
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
     }
 
     void OnCollisionEnter(Collision collision)

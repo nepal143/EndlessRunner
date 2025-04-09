@@ -37,15 +37,16 @@ public class NumberCollectible : MonoBehaviour
             Debug.LogWarning("CurrentNumberManager not found in scene!");
         }
 
-        // Play collect sound
-        if (collectSound != null)
-        {
-            AudioSource.PlayClipAtPoint(collectSound, transform.position);
-        }
-
-        // Spawn particle effect at spawn point or fallback to current position
+        // Determine spawn position (for both sound and particles)
         Vector3 spawnPosition = effectSpawnPoint != null ? effectSpawnPoint.position : transform.position;
 
+        // Play collect sound at the spawn point
+        if (collectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(collectSound, spawnPosition);
+        }
+
+        // Spawn particle effect
         if (particleEffectPrefab != null)
         {
             GameObject effectInstance = Instantiate(particleEffectPrefab, spawnPosition, Quaternion.identity);
