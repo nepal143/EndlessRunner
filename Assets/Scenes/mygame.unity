@@ -565,7 +565,9 @@ MonoBehaviour:
   typeSpeed: 0.05
   wrongSound: {fileID: 8300000, guid: 941c1dbe12fba9c458fc8ff0047bcc03, type: 3}
   correctSound: {fileID: 8300000, guid: c5357ab529bcfa044aca4627177ba57c, type: 3}
-  destroyEffect: {fileID: 6716933543107358038, guid: 8a334e7c388e77347a1dddd727ef3446,
+  correctDestroyEffect: {fileID: 6716933543107358038, guid: 8a334e7c388e77347a1dddd727ef3446,
+    type: 3}
+  wrongDestroyEffect: {fileID: 8423339054312034601, guid: 7b8d5fb54c6b12e4f8a1baa1a3eb94eb,
     type: 3}
 --- !u!4 &272535066 stripped
 Transform:

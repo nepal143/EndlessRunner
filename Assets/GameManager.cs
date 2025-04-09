@@ -15,8 +15,9 @@ public class GameManager : MonoBehaviour
     public AudioClip wrongSound;
     public AudioClip correctSound;
 
-    [Header("Destroy Effect")]
-    public ParticleSystem destroyEffect;
+    [Header("Destroy Effects")]
+    public ParticleSystem correctDestroyEffect;
+    public ParticleSystem wrongDestroyEffect;
 
     private int requiredNumber;
     private bool alreadyResetting = false;
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
                     AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
 
                 ScoreManager.Instance.AddScore(1);
+                CleanupTrashAndCubes(correctDestroyEffect); // ✅ Use correct effect
             }
             else
             {
@@ -55,9 +57,10 @@ public class GameManager : MonoBehaviour
 
                 if (wrongSound != null)
                     AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
+
+                CleanupTrashAndCubes(wrongDestroyEffect); // ❌ Use wrong effect
             }
 
-            CleanupTrashAndCubes(); // 💥 Clean up with particles
             ResetNumbers();
         }
     }
@@ -108,15 +111,15 @@ public class GameManager : MonoBehaviour
         alreadyResetting = false;
     }
 
-    void CleanupTrashAndCubes()
+    void CleanupTrashAndCubes(ParticleSystem effect)
     {
         Debug.Log("🧹 CleanupTrashAndCubes() called");
 
-        DestroyTaggedObjects("Trash");
-        DestroyTaggedObjects("Cubes");
+        DestroyTaggedObjects("Trash", effect);
+        DestroyTaggedObjects("Cubes", effect);
     }
 
-    void DestroyTaggedObjects(string tag)
+    void DestroyTaggedObjects(string tag, ParticleSystem effect)
     {
         GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
 
@@ -129,9 +132,9 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"🔥 Destroying object with tag '{tag}': {obj.name}");
 
-            if (destroyEffect != null)
+            if (effect != null)
             {
-                Instantiate(destroyEffect, obj.transform.position, Quaternion.identity);
+                Instantiate(effect, obj.transform.position, Quaternion.identity);
             }
 
             Destroy(obj);
