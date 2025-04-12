@@ -3,6 +3,19 @@ using System.Collections;
 
 public class EndlessRunnerController : MonoBehaviour
 {
+    [Header("UI Panels that control input")]
+    public GameObject panel1; // Swipe Left
+    public GameObject panel2; // Swipe Right
+    public GameObject panel3; // Hold to Sprint
+
+    private bool swipeLeftUnlocked = false;
+    private bool swipeRightUnlocked = false;
+    private bool sprintUnlocked = false;
+
+    private bool panel1WasActive = false;
+    private bool panel2WasActive = false;
+    private bool panel3WasActive = false;
+
     private int currentLane = 0; // -1 = left, 0 = center, 1 = right
     private float laneOffset = 1f;
     private float laneSwitchSpeed = 10f;
@@ -41,10 +54,18 @@ public class EndlessRunnerController : MonoBehaviour
 
     void Update()
     {
+        CheckAndUnlockAbilities();
+
+        if (!isHitAnimating)
+        {
+            MoveForward(); // Only move forward if not in hit animation
+        }
+
+        MoveToLane();
+
         if (!isStunned)
         {
             HandleSwipeInput();
-
             HandleSprintHold();
         }
         else
@@ -52,17 +73,33 @@ public class EndlessRunnerController : MonoBehaviour
             isSprinting = false;
             holdTimer = 0f;
         }
+    }
 
-        if (!isHitAnimating)
+    void CheckAndUnlockAbilities()
+    {
+        if (panel1 != null && panel1.activeInHierarchy && !panel1WasActive)
         {
-            MoveForward(); // Only move forward if not in hit animation
+            swipeLeftUnlocked = true;
+            panel1WasActive = true;
         }
 
-        MoveToLane(); // Always align to current lane
+        if (panel2 != null && panel2.activeInHierarchy && !panel2WasActive)
+        {
+            swipeRightUnlocked = true;
+            panel2WasActive = true;
+        }
+
+        if (panel3 != null && panel3.activeInHierarchy && !panel3WasActive)
+        {
+            sprintUnlocked = true;
+            panel3WasActive = true;
+        }
     }
 
     void HandleSwipeInput()
     {
+        if (!swipeLeftUnlocked && !swipeRightUnlocked) return;
+
         if (Input.GetMouseButtonDown(0))
         {
             swipeStart = Input.mousePosition;
@@ -76,9 +113,9 @@ public class EndlessRunnerController : MonoBehaviour
 
             if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y))
             {
-                if (swipeDelta.x > 50)
+                if (swipeDelta.x > 50 && swipeRightUnlocked)
                     ChangeLane(1);
-                else if (swipeDelta.x < -50)
+                else if (swipeDelta.x < -50 && swipeLeftUnlocked)
                     ChangeLane(-1);
             }
 
@@ -88,6 +125,8 @@ public class EndlessRunnerController : MonoBehaviour
 
     void HandleSprintHold()
     {
+        if (!sprintUnlocked) return;
+
         if (Input.GetMouseButton(0))
         {
             holdTimer += Time.deltaTime;
