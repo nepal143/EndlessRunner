@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
     private const int minDigitSum = 5;
     private const int maxDigitSum = 18;
 
+    private bool isFirstNumber = true; // ✅ Flag to check first number
+
     void Start()
     {
         StartCoroutine(AnimateRequiredNumberText());
@@ -88,11 +90,21 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // 🔢 Set new number with controlled digit sum
-        requiredNumber = GenerateNumberWithDigitSum(currentDigitSum);
-        currentDigitSum++;
-        if (currentDigitSum > maxDigitSum)
-            currentDigitSum = minDigitSum;
+        // 🔢 Set new number with special logic for trial
+        if (isFirstNumber && WebGLBridge.Instance != null && WebGLBridge.Instance.isTrial)
+        {
+            requiredNumber = 111;
+            Debug.Log("🎯 First trial number set to 111");
+        }
+        else
+        {
+            requiredNumber = GenerateNumberWithDigitSum(currentDigitSum);
+            currentDigitSum++;
+            if (currentDigitSum > maxDigitSum)
+                currentDigitSum = minDigitSum;
+        }
+
+        isFirstNumber = false; // ✅ Clear first number flag
 
         string fullText = "Give me " + requiredNumber;
         requiredNumberText.text = "";
@@ -140,8 +152,6 @@ public class GameManager : MonoBehaviour
             Destroy(obj);
         }
     }
-
-    // 🧠 Helper Methods
     int GenerateNumberWithDigitSum(int targetSum)
     {
         while (true)
