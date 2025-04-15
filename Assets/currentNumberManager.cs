@@ -91,24 +91,24 @@ public class CurrentNumberManager : MonoBehaviour
         numberText.text = to.ToString();
     }
 
-    void ShowMultiplierText(int amount)
+void ShowMultiplierText(int amount)
+{
+    // Update internal counts
+    switch (amount)
     {
-        string display = "";
-        switch (amount)
-        {
-            case 1: display = "1x" + count1; break;
-            case 10: display = "10x" + count10; break;
-            case 100: display = "100x" + count100; break;
-        }
-
-        multiplierText.text = display;
-
-        if (multiplierCoroutine != null)
-            StopCoroutine(multiplierCoroutine);
-        
-        multiplierCoroutine = StartCoroutine(AnimateMultiplierText());
+        case 1: count1++; break;
+        case 10: count10++; break;
+        case 100: count100++; break;
     }
 
+    // Just display the added value as "+X"
+    multiplierText.text = "+" + amount.ToString();
+
+    if (multiplierCoroutine != null)
+        StopCoroutine(multiplierCoroutine);
+
+    multiplierCoroutine = StartCoroutine(AnimateMultiplierText());
+}
     IEnumerator AnimateMultiplierText()
     {
         multiplierText.alpha = 0;
