@@ -16,7 +16,6 @@ public class TutorialManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // If on last screen, start game
             if (currentScreenIndex >= tutorialScreens.Length - 1)
             {
                 StartGame();
@@ -46,6 +45,6 @@ public class TutorialManager : MonoBehaviour
     {
         tutorialScreens[currentScreenIndex].SetActive(false);
         Time.timeScale = 1; // Resume the game
+        this.enabled = false; // 🚫 Disable this script to stop further input
     }
 }
- 

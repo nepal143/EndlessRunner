@@ -6,11 +6,15 @@ public class TimePauseController : MonoBehaviour
 
     private bool isPaused = false;
     private float longPressTime = 0.4f;
+    private float minPauseDuration = 0.4f;
+    private float pauseStartTime;
     private float touchStartTime;
     private Vector2 startTouchPos;
     private bool touchInProgress = false;
 
-    // Show dropdown in inspector
+    private float minSwipeDistance = 150f;     // Minimum distance in pixels
+    private float minSwipeHoldTime = 0.1f;      // Minimum time finger must be held before releasing
+
     public enum ResumeMethod { SwipeLeft, SwipeRight, LongPress }
 
     [Header("Select Resume Method From Dropdown")]
@@ -34,6 +38,7 @@ public class TimePauseController : MonoBehaviour
     {
         Time.timeScale = 0f;
         isPaused = true;
+        pauseStartTime = Time.unscaledTime;
 
         if (uiPanel != null)
             uiPanel.SetActive(true);
@@ -52,6 +57,9 @@ public class TimePauseController : MonoBehaviour
     {
         if (!isPaused) return;
 
+        if (Time.unscaledTime - pauseStartTime < minPauseDuration)
+            return;
+
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -64,24 +72,10 @@ public class TimePauseController : MonoBehaviour
                     touchInProgress = true;
                     break;
 
-                case TouchPhase.Moved:
-                    float deltaX = touch.position.x - startTouchPos.x;
-
-                    if (selectedResumeMethod == ResumeMethod.SwipeRight && deltaX > 100f)
-                    {
-                        ResumeTime();
-                        touchInProgress = false;
-                    }
-                    else if (selectedResumeMethod == ResumeMethod.SwipeLeft && deltaX < -100f)
-                    {
-                        ResumeTime();
-                        touchInProgress = false;
-                    }
-                    break;
-
                 case TouchPhase.Stationary:
                     if (selectedResumeMethod == ResumeMethod.LongPress &&
-                        touchInProgress && (Time.unscaledTime - touchStartTime) >= longPressTime)
+                        touchInProgress &&
+                        (Time.unscaledTime - touchStartTime) >= longPressTime)
                     {
                         ResumeTime();
                         touchInProgress = false;
@@ -89,6 +83,41 @@ public class TimePauseController : MonoBehaviour
                     break;
 
                 case TouchPhase.Ended:
+                    if (!touchInProgress) break;
+
+                    Vector2 endTouchPos = touch.position;
+                    float swipeTime = Time.unscaledTime - touchStartTime;
+                    float swipeDistance = Vector2.Distance(endTouchPos, startTouchPos);
+                    float deltaX = endTouchPos.x - startTouchPos.x;
+                    float deltaY = Mathf.Abs(endTouchPos.y - startTouchPos.y);
+
+                    // Avoid vertical swipes or diagonal swipes
+                    if (deltaY > Mathf.Abs(deltaX))
+                    {
+                        touchInProgress = false;
+                        break;
+                    }
+
+                    // Debug.Log($"Swipe: {deltaX}px in {swipeTime}s (dist: {swipeDistance})");
+
+                    if (selectedResumeMethod == ResumeMethod.SwipeRight &&
+                        deltaX > 0 &&
+                        swipeDistance > minSwipeDistance &&
+                        swipeTime >= minSwipeHoldTime)
+                    {
+                        ResumeTime();
+                    }
+                    else if (selectedResumeMethod == ResumeMethod.SwipeLeft &&
+                        deltaX < 0 &&
+                        swipeDistance > minSwipeDistance &&
+                        swipeTime >= minSwipeHoldTime)
+                    {
+                        ResumeTime();
+                    }
+
+                    touchInProgress = false;
+                    break;
+
                 case TouchPhase.Canceled:
                     touchInProgress = false;
                     break;
