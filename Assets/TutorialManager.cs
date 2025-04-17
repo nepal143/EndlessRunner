@@ -48,3 +48,4 @@ public class TutorialManager : MonoBehaviour
         Time.timeScale = 1; // Resume the game
     }
 }
+ 
