@@ -885,7 +885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &190593308
 Transform:
   m_ObjectHideFlags: 0
@@ -3059,7 +3059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32e47dcfe76681a4dba9571e39608769, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isTrial: 1
+  isTrial: 0
   trialGameObject: {fileID: 190593307}
   nonTrialGameObject: {fileID: 1634298223}
   baseDifficulty: 0

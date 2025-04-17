@@ -46,11 +46,30 @@ public class EndlessRunnerController : MonoBehaviour
 
     private BoxCollider playerCollider;
 
-    void Start()
+void Start()
+{
+    playerCollider = GetComponent<BoxCollider>();
+    targetPosition = transform.position;
+
+    // Automatically grant all movement powers if not a trial
+    if (WebGLBridge.Instance != null && !WebGLBridge.Instance.isTrial)
     {
-        playerCollider = GetComponent<BoxCollider>();
-        targetPosition = transform.position;
+        GrantAllPowers();
     }
+}
+void GrantAllPowers()
+{
+    Debug.Log("🕹️ Granting all movement powers to player (non-trial mode)");
+
+    swipeLeftUnlocked = true;
+    swipeRightUnlocked = true;
+    sprintUnlocked = true;
+
+    // Optionally hide the tutorial panels
+    if (panel1 != null) panel1.SetActive(false);
+    if (panel2 != null) panel2.SetActive(false);
+    if (panel3 != null) panel3.SetActive(false);
+}
 
     void Update()
     {
