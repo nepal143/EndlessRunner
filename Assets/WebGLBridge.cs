@@ -23,7 +23,7 @@ public class WebGLBridge : MonoBehaviour
     public GameObject trialGameObject;      // ✅ Assign UI/GameObject for Trial Mode
     public GameObject nonTrialGameObject;   // ✅ Assign UI/GameObject for Non-Trial Mode
 
-    private string baseUrl = "https://maidaan-api-server-44cf74tcjq-el.a.run.app/api/v1/webgl-game";
+    private string baseUrl = "https://maidaan-api-server-cfrlua66xq-el.a.run.app/api/v1/webgl-game";
     private UserData userData = new UserData();
 
     public int baseDifficulty;
