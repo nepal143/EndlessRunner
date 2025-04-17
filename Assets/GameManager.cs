@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
                 if (correctSound != null)
                     AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
 
-                ScoreManager.Instance.AddScore(1);
+                ScoreManager.Instance.AddScore(5);
                 CleanupTrashAndCubes(correctDestroyEffect); // ✅ Use correct effect
             }
             else
