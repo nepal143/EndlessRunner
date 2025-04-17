@@ -1,12 +1,13 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CurrentNumberManager : MonoBehaviour
 {
     [Header("References")]
-    public TextMeshProUGUI numberText;       // Assign in Inspector
-    public TextMeshProUGUI multiplierText;   // Assign in Inspector
+    public TextMeshProUGUI numberText;
+    public TextMeshProUGUI multiplierText;
     public float animationDuration = 0.5f;
     public float multiplierDisplayTime = 1.5f;
 
@@ -16,60 +17,74 @@ public class CurrentNumberManager : MonoBehaviour
     private Coroutine animationCoroutine;
     private Coroutine multiplierCoroutine;
 
-    private int count1 = 0;
-    private int count10 = 0;
-    private int count100 = 0;
+    // New: Dictionary to track how many times each value is added
+    private Dictionary<int, int> selectedBlocks = new Dictionary<int, int>
+    {
+        { 1, 0 },
+        { 10, 0 },
+        { 100, 0 }
+    };
 
     void Start()
     {
         UpdateNumberInstant(currentNumber);
-        multiplierText.alpha = 0; // Hide on start
+        multiplierText.alpha = 0;
     }
 
     public void IncreaseNumber(int amount)
     {
         int newTarget = currentNumber + amount;
 
-        // Update multiplier counts
-        switch (amount)
+        // Update dictionary count
+        if (selectedBlocks.ContainsKey(amount))
         {
-            case 1: count1++; break;
-            case 10: count10++; break;
-            case 100: count100++; break;
+            selectedBlocks[amount]++;
         }
 
-        // Update multiplier display
         ShowMultiplierText(amount);
 
-        // Stop any ongoing animation
         if (animationCoroutine != null)
-        {
             StopCoroutine(animationCoroutine);
-        }
 
-        // Start animating number
         animationCoroutine = StartCoroutine(AnimateNumber(currentNumber, newTarget, animationDuration));
         currentNumber = newTarget;
     }
 
-    public void SetNumber(int value)
+    void Update()
     {
-        // Stop animations
-        if (animationCoroutine != null) StopCoroutine(animationCoroutine);
-        if (multiplierCoroutine != null) StopCoroutine(multiplierCoroutine);
-
-        currentNumber = value;
-        UpdateNumberInstant(currentNumber);
-
-        if (value == 0)
+        // Log the current state of selectedBlocks
+        if (selectedBlocks[1] > 0 || selectedBlocks[10] > 0 || selectedBlocks[100] > 0)
         {
-            count1 = count10 = count100 = 0;
-            multiplierText.text = "";
-            multiplierText.alpha = 0;
+            string log = "[CurrentNumberManager] selectedBlocks: { ";
+            foreach (var kvp in selectedBlocks)
+            {
+                log += kvp.Key + ": " + kvp.Value + ", ";
+            }
+            log = log.TrimEnd(',', ' ') + " }";
+            Debug.Log(log);
         }
     }
+public void SetNumber(int value)
+{
+    if (animationCoroutine != null) StopCoroutine(animationCoroutine);
+    if (multiplierCoroutine != null) StopCoroutine(multiplierCoroutine);
 
-    void UpdateNumberInstant(int number)
+    currentNumber = value;
+    UpdateNumberInstant(currentNumber);
+
+    if (value == 0)
+    {
+        // FIX: Make a copy of keys before modifying the dictionary
+        List<int> keys = new List<int>(selectedBlocks.Keys);
+        foreach (int key in keys)
+        {
+            selectedBlocks[key] = 0;
+        }
+
+        multiplierText.text = "";
+        multiplierText.alpha = 0;
+    }
+}    void UpdateNumberInstant(int number)
     {
         if (numberText != null)
         {
@@ -91,24 +106,16 @@ public class CurrentNumberManager : MonoBehaviour
         numberText.text = to.ToString();
     }
 
-void ShowMultiplierText(int amount)
-{
-    // Update internal counts
-    switch (amount)
+    void ShowMultiplierText(int amount)
     {
-        case 1: count1++; break;
-        case 10: count10++; break;
-        case 100: count100++; break;
+        multiplierText.text = "+" + amount.ToString();
+
+        if (multiplierCoroutine != null)
+            StopCoroutine(multiplierCoroutine);
+
+        multiplierCoroutine = StartCoroutine(AnimateMultiplierText());
     }
 
-    // Just display the added value as "+X"
-    multiplierText.text = "+" + amount.ToString();
-
-    if (multiplierCoroutine != null)
-        StopCoroutine(multiplierCoroutine);
-
-    multiplierCoroutine = StartCoroutine(AnimateMultiplierText());
-}
     IEnumerator AnimateMultiplierText()
     {
         multiplierText.alpha = 0;
@@ -118,7 +125,6 @@ void ShowMultiplierText(int amount)
         float fadeInTime = 0.2f;
         float scaleTarget = 1.2f;
 
-        // Fade in and scale up
         while (elapsed < fadeInTime)
         {
             float t = elapsed / fadeInTime;
@@ -131,10 +137,8 @@ void ShowMultiplierText(int amount)
         multiplierText.alpha = 1;
         multiplierText.transform.localScale = Vector3.one;
 
-        // Wait
         yield return new WaitForSeconds(multiplierDisplayTime);
 
-        // Fade out
         elapsed = 0f;
         float fadeOutTime = 0.3f;
 

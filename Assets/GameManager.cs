@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class GameManager : MonoBehaviour
     private const int minDigitSum = 5;
     private const int maxDigitSum = 18;
 
-    private bool isFirstNumber = true; // ✅ Flag to check first number
+    private bool isFirstNumber = true;
 
     void Start()
     {
@@ -36,14 +37,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (currentNumberManager == null || alreadyResetting)
-            return;
+        if (alreadyResetting) return;
 
         int currentDisplayedNumber = currentNumberManager.currentNumber;
 
         if (currentDisplayedNumber >= requiredNumber && requiredNumber != 0)
         {
-            if (currentDisplayedNumber == requiredNumber)
+            bool isCorrect = currentDisplayedNumber == requiredNumber;
+
+            if (isCorrect)
             {
                 Debug.Log("✅ Correct number! Score +1");
 
@@ -51,7 +53,7 @@ public class GameManager : MonoBehaviour
                     AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
 
                 ScoreManager.Instance.AddScore(5);
-                CleanupTrashAndCubes(correctDestroyEffect); // ✅ Use correct effect
+                CleanupTrashAndCubes(correctDestroyEffect);
             }
             else
             {
@@ -60,11 +62,47 @@ public class GameManager : MonoBehaviour
                 if (wrongSound != null)
                     AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
 
-                CleanupTrashAndCubes(wrongDestroyEffect); // ❌ Use wrong effect
+                CleanupTrashAndCubes(wrongDestroyEffect);
             }
 
+            // ✅ SEND SCORE BEFORE RESET
+            SendScoreToServer(isCorrect);
             ResetNumbers();
         }
+    }
+
+    void SendScoreToServer(bool isCorrect)
+    {
+        if (WebGLBridge.Instance == null)
+        {
+            Debug.LogWarning("⚠️ WebGLBridge not found.");
+            return;
+        }
+
+        int finalScore = ScoreManager.Instance != null ? ScoreManager.Instance.score : 0;
+
+        // Access private selectedBlocks field via reflection
+        System.Reflection.FieldInfo field = typeof(CurrentNumberManager).GetField("selectedBlocks", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Dictionary<int, int> selectedBlocksCopy = field != null ? new Dictionary<int, int>((Dictionary<int, int>)field.GetValue(currentNumberManager)) : new Dictionary<int, int>();
+
+        // Manual JSON formatting for selectedBlocks
+        string selectedBlocksJson = "{";
+        foreach (var kvp in selectedBlocksCopy)
+        {
+            selectedBlocksJson += $"\"{kvp.Key}\": {kvp.Value}, ";
+        }
+        selectedBlocksJson = selectedBlocksJson.TrimEnd(',', ' ') + "}";
+
+        // Wrap entire JSON in an array (as per your format)
+        string jsonData = $"[{{" +
+            $"\"targetNumber\": {requiredNumber}, " +
+            $"\"numberMade\": {currentNumberManager.currentNumber}, " +
+            $"\"selectedBlocks\": {selectedBlocksJson}" +
+        "}}]";
+
+        Debug.Log($"📡 Sending data to server: {jsonData}");
+
+        WebGLBridge.Instance.UpdateScore(finalScore, jsonData);
     }
 
     void ResetNumbers()
@@ -90,7 +128,7 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // 🔢 Set new number with special logic for trial
+        // Set new number
         if (isFirstNumber && WebGLBridge.Instance != null && WebGLBridge.Instance.isTrial)
         {
             requiredNumber = 111;
@@ -104,7 +142,7 @@ public class GameManager : MonoBehaviour
                 currentDigitSum = minDigitSum;
         }
 
-        isFirstNumber = false; // ✅ Clear first number flag
+        isFirstNumber = false;
 
         string fullText = "Give me " + requiredNumber;
         requiredNumberText.text = "";
@@ -152,6 +190,7 @@ public class GameManager : MonoBehaviour
             Destroy(obj);
         }
     }
+
     int GenerateNumberWithDigitSum(int targetSum)
     {
         while (true)
