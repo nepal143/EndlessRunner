@@ -8,7 +8,7 @@ public class ScoreManager : MonoBehaviour
     [Header("References")]
     public TextMeshProUGUI scoreText;
     public AudioSource audioSource;         // Reference to the AudioSource
-    public AudioClip scoreSoundEffect;      // Sound to play when score increases
+    public AudioClip scoreSoundEffect;      // Sound to play when score ixncreases
 
     public int score = 0;
 

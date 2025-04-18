@@ -29,6 +29,22 @@ public class GameManager : MonoBehaviour
     private const int maxDigitSum = 18;
 
     private bool isFirstNumber = true;
+    int CountMatchingDigits(int a, int b)
+{
+    string strA = a.ToString();
+    string strB = b.ToString();
+
+    int matchCount = 0;
+    for (int i = 0; i < Mathf.Min(strA.Length, strB.Length); i++)
+    {
+        if (strA[i] == strB[i])
+        {
+            matchCount++;
+        }
+    }
+
+    return matchCount;
+}
 
     void Start()
     {
@@ -45,25 +61,41 @@ public class GameManager : MonoBehaviour
         {
             bool isCorrect = currentDisplayedNumber == requiredNumber;
 
-            if (isCorrect)
-            {
-                Debug.Log("✅ Correct number! Score +1");
+           if (isCorrect)
+{
+    Debug.Log("✅ Correct number! All digits match.");
 
-                if (correctSound != null)
-                    AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
+    if (correctSound != null)
+        AudioSource.PlayClipAtPoint(correctSound, Camera.main.transform.position);
 
-                ScoreManager.Instance.AddScore(5);
-                CleanupTrashAndCubes(correctDestroyEffect);
-            }
-            else
-            {
-                Debug.Log("❌ Too high!");
+    ScoreManager.Instance.AddScore(5);
+    CleanupTrashAndCubes(correctDestroyEffect); 
+}
+else
+{
+    int matchCount = CountMatchingDigits(currentDisplayedNumber, requiredNumber);
 
-                if (wrongSound != null)
-                    AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
+    if (matchCount > 0)
+    {
+        int bonus = matchCount == 1 ? 2 : 3;
+        Debug.Log($"🔢 {matchCount} digit(s) match. Partial score: +{bonus}");
 
-                CleanupTrashAndCubes(wrongDestroyEffect);
-            }
+        if (wrongSound != null)
+            AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
+
+        ScoreManager.Instance.AddScore(bonus);
+        CleanupTrashAndCubes(wrongDestroyEffect);
+    }
+    else
+    {
+        Debug.Log("❌ No matching digits. Wrong!");
+
+        if (wrongSound != null)
+            AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
+
+        CleanupTrashAndCubes(wrongDestroyEffect);
+    }
+}
 
             // ✅ SEND SCORE BEFORE RESET
             SendScoreToServer(isCorrect);
@@ -85,22 +117,22 @@ public class GameManager : MonoBehaviour
         System.Reflection.FieldInfo field = typeof(CurrentNumberManager).GetField("selectedBlocks", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         Dictionary<int, int> selectedBlocksCopy = field != null ? new Dictionary<int, int>((Dictionary<int, int>)field.GetValue(currentNumberManager)) : new Dictionary<int, int>();
 
-        // Manual JSON formatting for selectedBlocks
-        string selectedBlocksJson = "{";
-        foreach (var kvp in selectedBlocksCopy)
-        {
-            selectedBlocksJson += $"\"{kvp.Key}\": {kvp.Value}, ";
-        }
-        selectedBlocksJson = selectedBlocksJson.TrimEnd(',', ' ');  
+// Manual JSON formatting for selectedBlocks
+string selectedBlocksJson = "{";
+foreach (var kvp in selectedBlocksCopy)
+{
+    selectedBlocksJson += $"\"{kvp.Key}\": {kvp.Value}, ";
+}
+selectedBlocksJson = selectedBlocksJson.TrimEnd(',', ' ') + "}";
 
-        // Wrap entire JSON in an array (as per your format)
-string jsonData = $"[{{" +
-    $"\"targetNumber\": {requiredNumber}, " +
-    $"\"numberMade\": {currentNumberManager.currentNumber}, " +
-    $"\"selectedBlocks\": {selectedBlocksJson}, " +
-    $"\"result\": \"{(isCorrect ? "Correct" : "Incorrect")}\"" +
-"}}]";
-
+// Build the final JSON
+string jsonData =
+    "[{" +
+        $"\"targetNumber\": {requiredNumber}, " +
+        $"\"numberMade\": {currentNumberManager.currentNumber}, " +
+        $"\"selectedBlocks\": {selectedBlocksJson}, " +
+        $"\"result\": \"{(isCorrect ? "Correct" : "Incorrect")}\"" +
+    "}]";
         Debug.Log($"📡 Sending data to server: {jsonData}");
 
         WebGLBridge.Instance.UpdateScore(finalScore, jsonData);
@@ -143,7 +175,7 @@ IEnumerator AnimateRequiredNumberText()
             currentDigitSum = minDigitSum;
     }
 
-    string fullText = "Give me " + requiredNumber;
+    string fullText = "" + requiredNumber;
     requiredNumberText.text = "";
     requiredNumberText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f);
 

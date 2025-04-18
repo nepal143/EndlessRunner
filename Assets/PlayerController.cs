@@ -17,7 +17,7 @@ public class EndlessRunnerController : MonoBehaviour
     private bool panel3WasActive = false;
 
     private int currentLane = 0; // -1 = left, 0 = center, 1 = right
-    private float laneOffset = 1f;
+    private float laneOffset = 1.3f;
     private float laneSwitchSpeed = 10f;
     private Vector3 targetPosition;
 
