@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     [Header("Destroy Effects")]
     public ParticleSystem correctDestroyEffect;
     public ParticleSystem wrongDestroyEffect;
+    public ParticleSystem PartialDestroyEffect;
+    
+
 
     private int requiredNumber;
     private bool alreadyResetting = false;
@@ -77,14 +80,14 @@ else
 
     if (matchCount > 0)
     {
-        int bonus = matchCount == 1 ? 2 : 3;
+        int bonus = matchCount == 1 ? 1 : 2;
         Debug.Log($"🔢 {matchCount} digit(s) match. Partial score: +{bonus}");
 
         if (wrongSound != null)
             AudioSource.PlayClipAtPoint(wrongSound, Camera.main.transform.position);
 
         ScoreManager.Instance.AddScore(bonus);
-        CleanupTrashAndCubes(wrongDestroyEffect);
+        CleanupTrashAndCubes(PartialDestroyEffect);
     }
     else
     {
